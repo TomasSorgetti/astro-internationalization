@@ -2,4 +2,32 @@
 
 ---
 
-<meta http-equiv="refresh" content="0;url=/en/" />
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting...</title>
+    <script is:inline>
+      (function () {
+        const savedLang = localStorage.getItem("preferred-lang");
+        const browserLang = navigator.language.split("-")[0];
+        const supportedLangs = ["en", "es"];
+        const defaultLang = "en";
+
+        const targetLang =
+          savedLang && supportedLangs.includes(savedLang)
+            ? savedLang
+            : supportedLangs.includes(browserLang)
+              ? browserLang
+              : defaultLang;
+
+        window.location.replace("/" + targetLang + "/");
+      })();
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <p>Please follow <a href="/en/">this link</a>.</p>
+    </noscript>
+  </body>
+</html>

@@ -127,6 +127,18 @@ const currentLanguageLabel = languages[lang as keyof typeof languages];
       toggleMenu();
     });
 
+    // Save language preference on click
+    menu.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        const url = new URL(link.href);
+        const parts = url.pathname.split("/").filter(Boolean);
+        const code = parts[0];
+        if (code) {
+          localStorage.setItem("preferred-lang", code);
+        }
+      });
+    });
+
     document.addEventListener("click", (e) => {
       if (!picker) return;
       if (!picker.contains(e.target as Node)) {

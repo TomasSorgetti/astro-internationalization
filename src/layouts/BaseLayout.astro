@@ -1,0 +1,78 @@
+---
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+import { languages } from "../i18n/ui";
+import Footer from "./Footer.astro";
+import Navbar from "./Navbar.astro";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+const { title, description, image = "/placeholder-og.jpg" } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const pathname = Astro.url.pathname;
+const pathWithoutLang = pathname.replace(new RegExp(`^/${lang}`), "");
+
+const siteUrl = Astro.site ?? "https://example.com";
+const canonicalURL = new URL(pathname, siteUrl);
+
+const alternates = Object.keys(languages).map((code) => ({
+  lang: code,
+  href: new URL(`/${code}${pathWithoutLang}`, siteUrl).href,
+}));
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO -->
+    <title>{title}</title>
+    <meta name="description" content={description ?? t("hero.subtitle")} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Hreflang Tags -->
+    {
+      alternates.map(({ lang, href }) => (
+        <link rel="alternate" hreflang={lang} href={href} />
+      ))
+    }
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={alternates.find((a) => a.lang === "es")?.href}
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta
+      property="og:description"
+      content={description ?? t("hero.subtitle")}
+    />
+    <meta property="og:image" content={new URL(image, siteUrl)} />
+    <meta property="og:locale" content={lang === "es" ? "es_ES" : "en_US"} />
+  </head>
+  <body
+    class="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900 antialiased"
+  >
+    <Navbar />
+
+    <main class="flex-grow">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>

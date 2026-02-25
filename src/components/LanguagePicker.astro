@@ -1,0 +1,147 @@
+---
+import { languages } from "../i18n/ui";
+import { getLangFromUrl } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const currentLanguageLabel = languages[lang as keyof typeof languages];
+---
+
+<div class="relative inline-block text-left" id="language-picker">
+  <button
+    type="button"
+    class="inline-flex cursor-pointer items-center justify-between w-full rounded-xl border border-gray-200 shadow-sm px-4 py-2.5 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 min-w-[120px]"
+    id="lang-button"
+    aria-expanded="false"
+    aria-haspopup="true"
+  >
+    <div class="flex items-center gap-2">
+      <span class="flex h-2 w-2 rounded-full bg-indigo-600"></span>
+      <span>{currentLanguageLabel}</span>
+    </div>
+    <svg
+      class="ml-2 h-4 w-4 text-gray-400 transition-transform duration-200"
+      id="lang-chevron"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+        clip-rule="evenodd"></path>
+    </svg>
+  </button>
+
+  <div
+    class="origin-top-right absolute right-0 mt-2 w-48 rounded-xl shadow-xl bg-white ring-1 ring-black/5 divide-y divide-gray-100 focus:outline-none hidden opacity-0 scale-95 transition-all duration-200 z-50 overflow-hidden"
+    id="lang-menu"
+    role="menu"
+    aria-orientation="vertical"
+    aria-labelledby="lang-button"
+    tabindex="-1"
+  >
+    <div class="py-1.5 px-1.5" role="none">
+      {
+        Object.entries(languages).map(([code, label]) => (
+          <a
+            href={`/${code}/`}
+            class={`group flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-all duration-200 ${
+              lang === code
+                ? "bg-indigo-50 text-indigo-700 font-bold"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+            role="menuitem"
+          >
+            <span>{label}</span>
+            {lang === code && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            )}
+            {lang !== code && (
+              <span class="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                {code.toUpperCase()}
+              </span>
+            )}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<script>
+  function setupLanguagePicker() {
+    const picker = document.getElementById("language-picker");
+    const button = document.getElementById("lang-button");
+    const menu = document.getElementById("lang-menu");
+    const chevron = document.getElementById("lang-chevron");
+
+    if (!button || !menu || !chevron) return;
+
+    function toggleMenu() {
+      if (!button || !menu || !chevron) return;
+
+      const isExpanded = button.getAttribute("aria-expanded") === "true";
+      button.setAttribute("aria-expanded", (!isExpanded).toString());
+
+      if (!isExpanded) {
+        menu.classList.remove("hidden");
+        // Small delay for transition
+        requestAnimationFrame(() => {
+          menu.classList.remove("opacity-0", "scale-95");
+          menu.classList.add("opacity-100", "scale-100");
+          chevron.classList.add("rotate-180");
+        });
+      } else {
+        closeMenu();
+      }
+    }
+
+    function closeMenu() {
+      if (!button || !menu || !chevron) return;
+
+      button.setAttribute("aria-expanded", "false");
+      menu.classList.remove("opacity-100", "scale-100");
+      menu.classList.add("opacity-0", "scale-95");
+      chevron.classList.remove("rotate-180");
+
+      setTimeout(() => {
+        if (button.getAttribute("aria-expanded") === "false") {
+          menu.classList.add("hidden");
+        }
+      }, 200);
+    }
+
+    button.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!picker) return;
+      if (!picker.contains(e.target as Node)) {
+        closeMenu();
+      }
+    });
+
+    // Close on escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeMenu();
+      }
+    });
+  }
+
+  setupLanguagePicker();
+  document.addEventListener("astro:after-swap", setupLanguagePicker);
+</script>

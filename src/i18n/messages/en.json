@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "blog": "Blog",
+    "services": "Services",
+    "contact": "Contact"
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  },
+  "hero": {
+    "title": "Internationalization of websites with Astro"
+  },
+  "language": {
+    "picker": "Switch language"
+  }
+}

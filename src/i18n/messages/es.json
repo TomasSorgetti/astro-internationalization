@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "blog": "Blog",
+    "services": "Servicios",
+    "contact": "Contacto"
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados."
+  },
+  "hero": {
+    "title": "Internacionalización de sitios web con Astro"
+  },
+  "language": {
+    "picker": "Cambiar idioma"
+  }
+}
